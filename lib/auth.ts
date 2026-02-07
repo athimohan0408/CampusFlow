@@ -59,22 +59,31 @@ export const authOptions: NextAuthOptions = {
                     email: user.email,
                     image: user.image,
                     role: user.role,
+                    isProfileComplete: user.isProfileComplete,
                 };
             },
         }),
     ],
     callbacks: {
-        async jwt({ token, user }) {
+        async jwt({ token, user, trigger, session }) {
             if (user) {
                 token.role = user.role;
                 token.id = user.id;
+                token.isProfileComplete = (user as any).isProfileComplete;
             }
+
+            // Allow updating session from client
+            if (trigger === "update" && session?.isProfileComplete) {
+                token.isProfileComplete = session.isProfileComplete;
+            }
+
             return token;
         },
         async session({ session, token }) {
             if (session.user) {
                 session.user.role = token.role as string;
                 session.user.id = token.id as string;
+                (session.user as any).isProfileComplete = token.isProfileComplete as boolean;
             }
             return session;
         },

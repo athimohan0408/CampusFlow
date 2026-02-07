@@ -136,21 +136,59 @@ export default function AdminDashboardPage() {
                     </CardContent>
                 </Card>
 
-                {/* Recent Activity / Notifications placeholder */}
+                {/* Users List */}
                 <Card className="col-span-3">
                     <CardHeader>
-                        <CardTitle>Recent Activity</CardTitle>
-                        <CardDescription>Latest registrations and actions</CardDescription>
+                        <CardTitle>Registered Users</CardTitle>
+                        <CardDescription>Recently registered students</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="space-y-4">
-                            <p className="text-sm text-muted-foreground text-center py-10">
-                                No recent activity to display.
-                            </p>
-                        </div>
+                        <UsersList />
                     </CardContent>
                 </Card>
             </div>
+        </div>
+    );
+}
+
+function UsersList() {
+    const [users, setUsers] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetch('/api/admin/users')
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) setUsers(data.slice(0, 5)); // Limit to 5 for dashboard
+            })
+            .catch(console.error)
+            .finally(() => setLoading(false));
+    }, []);
+
+    if (loading) return <div className="text-sm text-muted-foreground">Loading users...</div>;
+    if (users.length === 0) return <div className="text-sm text-muted-foreground">No users registered yet.</div>;
+
+    return (
+        <div className="space-y-4">
+            {users.map((user) => (
+                <div key={user._id} className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                            {user.name[0]}
+                        </div>
+                        <div>
+                            <p className="text-sm font-medium">{user.name}</p>
+                            <p className="text-xs text-muted-foreground">{user.email}</p>
+                        </div>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                        {user.course || 'N/A'} - {user.department || 'N/A'}
+                    </div>
+                </div>
+            ))}
+            <Button variant="ghost" className="w-full text-xs" asChild>
+                <Link href="/admin/users">View All Users</Link>
+            </Button>
         </div>
     );
 }

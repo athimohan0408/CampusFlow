@@ -10,6 +10,9 @@ export interface IEvent extends Document {
     registrationLimit?: number;
     posterUrl?: string;
     tags: string[];
+    allowedCourses?: string[];
+    allowedDepartments?: string[];
+    allowedYears?: number[];
     status: 'draft' | 'published' | 'ongoing' | 'completed' | 'archived';
 
     // Enabled Modules
@@ -43,6 +46,9 @@ const EventSchema: Schema = new Schema({
     registrationLimit: { type: Number },
     posterUrl: { type: String },
     tags: [{ type: String }],
+    allowedCourses: [{ type: String }],
+    allowedDepartments: [{ type: String }],
+    allowedYears: [{ type: Number }],
     status: {
         type: String,
         enum: ['draft', 'published', 'ongoing', 'completed', 'archived'],

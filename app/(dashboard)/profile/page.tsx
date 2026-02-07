@@ -23,13 +23,19 @@ import { Badge } from "@/components/ui/badge";
 export default function ProfilePage() {
     const { data: session, status } = useSession();
     const [registrations, setRegistrations] = useState<any[]>([]);
+    const [profile, setProfile] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (status === 'authenticated') {
-            fetch('/api/users/me/registrations')
-                .then(res => res.json())
-                .then(data => setRegistrations(data))
+            Promise.all([
+                fetch('/api/users/me/registrations').then(res => res.json()),
+                fetch('/api/users/me').then(res => res.json())
+            ])
+                .then(([regsData, profileData]) => {
+                    setRegistrations(regsData);
+                    setProfile(profileData);
+                })
                 .catch(err => console.error(err))
                 .finally(() => setLoading(false));
         }
@@ -49,18 +55,42 @@ export default function ProfilePage() {
         <div className="max-w-4xl mx-auto space-y-8">
             {/* Profile Header */}
             <Card>
-                <CardContent className="flex flex-col md:flex-row items-center gap-6 p-6">
+                <CardContent className="flex flex-col md:flex-row items-start gap-6 p-6">
                     <Avatar className="h-24 w-24">
                         <AvatarImage src={session.user.image || undefined} />
                         <AvatarFallback className="text-2xl">{userInitials}</AvatarFallback>
                     </Avatar>
-                    <div className="text-center md:text-left space-y-1">
-                        <h1 className="text-2xl font-bold">{session.user.name}</h1>
-                        <p className="text-muted-foreground">{session.user.email}</p>
-                        <Badge variant="outline" className="capitalize mt-2">{session.user.role}</Badge>
-                    </div>
-                    <div className="ml-auto">
-                        <Button variant="outline">Edit Profile</Button>
+                    <div className="flex-1 space-y-4">
+                        <div className="space-y-1 text-center md:text-left">
+                            <h1 className="text-2xl font-bold">{session.user.name}</h1>
+                            <p className="text-muted-foreground">{session.user.email}</p>
+                            <Badge variant="outline" className="capitalize mt-2">{session.user.role}</Badge>
+                        </div>
+
+                        {profile && (
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t">
+                                <div>
+                                    <p className="text-xs text-muted-foreground uppercase font-semibold">Course</p>
+                                    <p className="font-medium">{profile.course || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-muted-foreground uppercase font-semibold">Dept</p>
+                                    <p className="font-medium">{profile.department || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-muted-foreground uppercase font-semibold">Year</p>
+                                    <p className="font-medium">{profile.year ? `${profile.year} Year` : 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-muted-foreground uppercase font-semibold">Interests</p>
+                                    <div className="flex flex-wrap gap-1 mt-1">
+                                        {profile.interests?.map((i: string) => (
+                                            <Badge key={i} variant="secondary" className="text-[10px] px-1 py-0">{i}</Badge>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </CardContent>
             </Card>

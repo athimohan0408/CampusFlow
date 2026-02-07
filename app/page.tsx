@@ -3,8 +3,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { GraduationCap, ArrowRight } from "lucide-react";
 import { FadeIn } from "@/components/ui/fade-in";
+import { useSession } from "next-auth/react";
 
 export default function LandingPage() {
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === 'admin' || session?.user?.role === 'super-admin';
+
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground overflow-hidden relative">
 
@@ -53,9 +57,10 @@ export default function LandingPage() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
-            <Link href="/login">
+            <Link href={isAdmin ? "/admin" : (session ? "/feed" : "/login")}>
               <Button size="lg" className="h-14 px-10 text-lg rounded-full shadow-[0_0_40px_-10px_hsl(var(--primary)/0.5)] hover:shadow-[0_0_60px_-15px_hsl(var(--primary)/0.6)] hover:scale-105 transition-all duration-300 bg-gradient-to-r from-primary to-purple-600 border-0">
-                Login to Dashboard <ArrowRight className="ml-2 h-5 w-5" />
+                {session ? (isAdmin ? "Go to Admin Dashboard" : "Go to Feed") : "Login to Get Started"}
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
           </div>

@@ -6,9 +6,11 @@ export interface IUser extends Document {
     image?: string;
     password?: string;
     role: 'student' | 'admin' | 'super-admin';
+    course?: string;
     department?: string;
     year?: number;
     interests: string[];
+    isProfileComplete: boolean;
     preferences: {
         eventCategories: string[];
         notifications: boolean;
@@ -27,9 +29,11 @@ const UserSchema: Schema = new Schema({
         default: 'student'
     },
     password: { type: String, select: false },
+    course: { type: String },
     department: { type: String },
     year: { type: Number },
     interests: [{ type: String }],
+    isProfileComplete: { type: Boolean, default: false },
     preferences: {
         eventCategories: [{ type: String }],
         notifications: { type: Boolean, default: true },
