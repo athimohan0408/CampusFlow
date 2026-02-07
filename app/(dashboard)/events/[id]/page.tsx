@@ -163,10 +163,12 @@ export default function EventDetailsPage() {
                                     <Button
                                         className="w-full text-lg py-6 font-bold shadow-md hover:shadow-lg transition-all"
                                         onClick={handleRegister}
-                                        disabled={registering || !event.modules.registration}
+                                        disabled={registering || !event.modules.registration || session?.user?.role === 'admin' || session?.user?.role === 'super-admin'}
                                     >
                                         {registering && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                        {event.modules.registration ? "Register Now" : "Registration Closed"}
+                                        {session?.user?.role === 'admin' || session?.user?.role === 'super-admin'
+                                            ? "Admins cannot register"
+                                            : event.modules.registration ? "Register Now" : "Registration Closed"}
                                     </Button>
                                 )}
                                 {registration && (

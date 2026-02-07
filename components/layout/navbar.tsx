@@ -37,14 +37,15 @@ export default function Navbar() {
                         <Home className="h-4 w-4" />
                         Feed
                     </Link>
-                    <Link href="/events" className="flex items-center gap-2 hover:text-primary transition-colors">
-                        <Calendar className="h-4 w-4" />
-                        My Events
-                    </Link>
-                    {session?.user?.role === "admin" && (
-                        <Link href="/admin" className="flex items-center gap-2 hover:text-primary transition-colors">
-                            <Settings className="h-4 w-4" />
-                            Admin
+                    {session?.user?.role === "admin" ? (
+                        <Link href="/admin/events" className="flex items-center gap-2 hover:text-primary transition-colors">
+                            <Calendar className="h-4 w-4" />
+                            My Events
+                        </Link>
+                    ) : (
+                        <Link href="/events" className="flex items-center gap-2 hover:text-primary transition-colors">
+                            <Calendar className="h-4 w-4" />
+                            My Events
                         </Link>
                     )}
                 </nav>
